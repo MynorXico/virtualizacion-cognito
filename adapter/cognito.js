@@ -4,16 +4,18 @@ const jwkToPem = require('jwk-to-pem');
 const User = require('../models/user').User;
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const jwt_decode = require('jwt-decode');
 
 dotenv.config();
 
-const poolRegion = process.env.COGNITO_POOL_REGION;
-const userPoolId = process.env.COGNITO_POOL_ID;
-
-const cognito_url = `https://cognito-idp.${poolRegion}.amazonaws.com/${userPoolId}/.well-known/jwks.json`;
 
 exports.validate = async (token) => {
     return new Promise(async(resolve, reject) => {
+        var decoded = (jwt_decode(token));
+        
+        const cognito_url = `${decoded.iss}/.well-known/jwks.json`;
+
+        console.log("Decoded: ", decoded);
         await axios.get(cognito_url)
             .then(({status, data}) => {
                 pems = {};

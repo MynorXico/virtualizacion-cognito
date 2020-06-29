@@ -19,3 +19,4 @@ jobs:
         region: us-east-1
         tags: latest,${{ github.sha }}
         create_repo: true
+	path: /
