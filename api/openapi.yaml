@@ -1,0 +1,84 @@
+openapi: 3.0.2
+info:
+  title: Authentication Services
+  description: This is the Authentication server.  You can find out more about this  at
+    link
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: https://custom.endpoint/v1
+tags:
+- name: validate
+  description: Checking if a jwt is valild
+  externalDocs:
+    description: Find out more
+    url: http://swagger.io
+paths:
+  /validate:
+    post:
+      tags:
+      - validate
+      summary: Verifies if a user exists
+      operationId: validate
+      requestBody:
+        description: JWT object that needs to bes validated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Jwt'
+      responses:
+        "200":
+          description: Usuario válido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "400":
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "405":
+          description: Validation exception
+          content: {}
+      x-codegen-request-body-name: body
+      x-swagger-router-controller: Validate
+components:
+  schemas:
+    Jwt:
+      required:
+      - jwt
+      type: object
+      properties:
+        jwt:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+      example:
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        email: "user@test1.com"
+        username: username
+    Error:
+      type: object
+      properties:
+        error:
+          maximum: 2
+          minimum: 1
+          type: integer
+        message:
+          type: string
