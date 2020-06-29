@@ -1,9 +1,9 @@
 const axios = require('axios');
 
-const dotenv = require('dotenv');
 const jwkToPem = require('jwk-to-pem');
 const User = require('../models/user').User;
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
