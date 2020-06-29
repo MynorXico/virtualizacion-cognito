@@ -25,5 +25,5 @@ jobs:
         account_id: ${{ secrets.AWS_ACCOUNT_ID }}
         repo: my-first-ecr-repo
         region: us-east-1
-        tags: my-first-ecr-repo
+        tags: latest #my-first-ecr-repo
         create_repo: false
