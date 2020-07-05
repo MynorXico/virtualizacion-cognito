@@ -2,11 +2,65 @@ const axios = require("axios");
 
 const jwkToPem = require("jwk-to-pem");
 const User = require("../models/user").User;
+const AwsUser = require("../models/awsUser").awsUser;
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const jwt_decode = require("jwt-decode");
 
 dotenv.config();
+
+var AWS = require("aws-sdk");
+
+const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
+const usersPoolName = process.env.USER_POOL_NAME;
+
+exports.getUsers = async () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      var userPools = await getPools();
+    } catch (err) {
+      console.error(err);
+      reject({ error: true, message: "Error al obtener pools" });
+    }
+    var usersPool = userPools.UserPools.find(
+      (pool) => pool.Name == usersPoolName
+    );
+    cognitoIdentityServiceProvider.listUsers(
+      { UserPoolId: usersPool.Id },
+      function (err, data) {
+        if (err) {
+          console.error(err);
+          reject({
+            error: true,
+            message: "Error al obtener usuarios del pool",
+          });
+        } else {
+          var mappedUsers = data.Users.map(user => new AwsUser(user))
+          resolve(mappedUsers);
+        }
+      }
+    );
+  });
+};
+
+getPools = async () => {
+  return new Promise(async (resolve, reject) => {
+    var pools = cognitoIdentityServiceProvider.listUserPools(
+      { MaxResults: 2 },
+      function (err, data) {
+        if (err) {
+          console.error(err);
+          reject({
+            error: true,
+            message: "Error al obtener pool de direcciones",
+          });
+        } else {
+          resolve(data);
+        }
+      }
+    );
+  });
+};
 
 exports.validate = async (token) => {
   return new Promise(async (resolve, reject) => {

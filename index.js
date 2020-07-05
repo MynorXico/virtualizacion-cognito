@@ -20,6 +20,8 @@ var expressAppConfig = oas3Tools.expressAppConfig(
 expressAppConfig.addValidator();
 var app = expressAppConfig.getApp();
 
+var routes = require('./routes');
+
 // Add headers
 app.use(function (req, res, next) {
   // Website you wish to allow to connect
@@ -50,6 +52,8 @@ app.use(function (req, res, next) {
 
 // Initialize the Swagger middleware
 http.createServer(app).listen(serverPort, "0.0.0.0", function () {
+  app.use('/users/', routes);
+
   console.log(
     "Your server is listening on port %d (http://localhost:%d)",
     serverPort,

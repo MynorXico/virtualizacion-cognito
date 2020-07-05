@@ -46,6 +46,15 @@ paths:
           content: {}
       x-codegen-request-body-name: body
       x-swagger-router-controller: Validate
+  /user:
+    get:
+      tags:
+      - user
+      summary: Obtener usuarios
+      operationId: user
+      responses:
+        "200":
+          description: Obtener usuario
 components:
   schemas:
     Jwt:
