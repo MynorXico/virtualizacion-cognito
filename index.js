@@ -20,7 +20,6 @@ var expressAppConfig = oas3Tools.expressAppConfig(
 expressAppConfig.addValidator();
 var app = expressAppConfig.getApp();
 
-var routes = require('./routes');
 
 // Add headers
 app.use(function (req, res, next) {
@@ -49,6 +48,9 @@ app.use(function (req, res, next) {
   // Pass to next layer of middleware
   next();
 });
+
+var routes = require('./routes');
+
 
 // Initialize the Swagger middleware
 http.createServer(app).listen(serverPort, "0.0.0.0", function () {
