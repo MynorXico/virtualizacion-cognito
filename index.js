@@ -1,5 +1,6 @@
 "use strict";
 const dotenv = require("dotenv");
+var cors = require('cors')
 
 dotenv.config();
 var path = require("path");
@@ -19,7 +20,7 @@ var expressAppConfig = oas3Tools.expressAppConfig(
 );
 expressAppConfig.addValidator();
 var app = expressAppConfig.getApp();
-
+app.use(cors());
 
 // Add headers
 app.use(function (req, res, next) {
