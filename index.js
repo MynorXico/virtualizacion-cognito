@@ -1,7 +1,7 @@
 "use strict";
 const dotenv = require("dotenv");
 var cors = require('cors')
-
+var express = require('express');
 dotenv.config();
 var path = require("path");
 var http = require("http");
@@ -55,6 +55,9 @@ var routes = require('./routes');
 
 // Initialize the Swagger middleware
 http.createServer(app).listen(serverPort, "0.0.0.0", function () {
+  var defaultRouter = express.Router();
+  defaultRouter.get('/', (req, res) => {res.send({"api": "identity"})})
+  app.use('/', defaultRouter);
   app.use('/users/', routes);
 
   console.log(
