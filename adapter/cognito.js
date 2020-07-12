@@ -94,7 +94,43 @@ exports.changeRole = async (username) => {
     });
   });
 };
+exports.getUserGroups = async (username) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      var userPools = await getPools();
+    } catch (err) {
+      console.error(err);
+      reject({ error: true, message: "Error al obtener pool" });
+    }
 
+    var usersPool = userPools.UserPools.find(
+      (pool) => pool.Name == usersPoolName
+    );
+
+    // Verificar si usuario ya es admin
+    var params = {
+      UserPoolId: usersPool.Id,
+      Username: username,
+    };    
+    cognitoIdentityServiceProvider.adminListGroupsForUser(params, function (
+      err,
+      data
+    ) {
+      if (err) {
+        console.log(err, err.stack);
+        reject({
+          error: true,
+          message: "Error al eliminar obtener rol de usuario",
+          aws: err,
+        });
+      } else {
+        isAdmin = data.Groups.length > 0;
+        resolve(isAdmin?'admin':'customer');
+        console.log(isAdmin);
+      }
+    });
+  });
+};
 exports.getUsers = async () => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -116,7 +152,14 @@ exports.getUsers = async () => {
             message: "Error al obtener usuarios del pool",
           });
         } else {
-          var mappedUsers = data.Users.map((user) => new AwsUser(user));
+          var mappedUsers = data.Users.map((user) => {
+            var username = user.Username;
+            var params = {
+              UserPoolId: usersPool.Id,
+              Username: username,
+            };
+            return new AwsUser(user);
+          });
           resolve(mappedUsers);
         }
       }
