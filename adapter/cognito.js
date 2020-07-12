@@ -14,6 +14,87 @@ var AWS = require("aws-sdk");
 const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 const usersPoolName = process.env.USER_POOL_NAME;
 
+exports.changeRole = async (username) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      var userPools = await getPools();
+    } catch (err) {
+      console.error(err);
+      reject({ error: true, message: "Error al obtener pool" });
+    }
+
+    var usersPool = userPools.UserPools.find(
+      (pool) => pool.Name == usersPoolName
+    );
+
+    // Verificar si usuario ya es admin
+    var params = {
+      UserPoolId: usersPool.Id,
+      Username: username,
+    };
+    var isAdmin = false;
+    cognitoIdentityServiceProvider.adminListGroupsForUser(params, function (
+      err,
+      data
+    ) {
+      if (err) {
+        console.log(err, err.stack);
+        reject({
+          error: true,
+          message: "Error al eliminar usuario de group",
+          aws: err,
+        });
+      } else {
+        isAdmin = data.Groups.length > 0;
+        console.log(isAdmin);
+        var params = {
+          GroupName: "Administrator",
+          UserPoolId: usersPool.Id,
+          Username: username,
+        };
+        if (isAdmin) {
+          cognitoIdentityServiceProvider.adminRemoveUserFromGroup(
+            params,
+            function (err, data) {
+              if (err) {
+                console.log(err);
+                reject({
+                  error: true,
+                  message: "Error al eliminar usuario de group",
+                  aws: err,
+                });
+              } else {
+                resolve({
+                  response: data,
+                });
+              }
+            }
+          );
+        } else {
+          cognitoIdentityServiceProvider.adminAddUserToGroup(params, function (
+            err,
+            data
+          ) {
+            if (err) {
+              console.error(err);
+              reject({
+                error: true,
+                message: "Error al agregar usuario a grupo",
+                aws: err,
+              });
+            } else {
+              resolve({
+                response: data,
+              });
+              console.log("Response: ", data);
+            }
+          });
+        }
+      }
+    });
+  });
+};
+
 exports.getUsers = async () => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -35,7 +116,7 @@ exports.getUsers = async () => {
             message: "Error al obtener usuarios del pool",
           });
         } else {
-          var mappedUsers = data.Users.map(user => new AwsUser(user))
+          var mappedUsers = data.Users.map((user) => new AwsUser(user));
           resolve(mappedUsers);
         }
       }
@@ -75,7 +156,6 @@ exports.validate = async (token) => {
 
     const cognito_url = `${decoded.iss}/.well-known/jwks.json`;
 
-    console.log("Decoded: ", decoded);
     await axios
       .get(cognito_url)
       .then(({ status, data }) => {

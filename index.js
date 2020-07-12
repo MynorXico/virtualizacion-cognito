@@ -5,7 +5,7 @@ var express = require('express');
 dotenv.config();
 var path = require("path");
 var http = require("http");
-
+const bearerToken = require('express-bearer-token');
 var oas3Tools = require("oas3-tools");
 var serverPort = process.env.PORT;
 
@@ -20,6 +20,7 @@ var expressAppConfig = oas3Tools.expressAppConfig(
 );
 expressAppConfig.addValidator();
 var app = expressAppConfig.getApp();
+app.use(bearerToken())
 app.use(cors());
 
 // Add headers
@@ -58,8 +59,8 @@ http.createServer(app).listen(serverPort, "0.0.0.0", function () {
   var defaultRouter = express.Router();
   defaultRouter.get('/', (req, res) => {res.send({"api": "identity"})})
   app.use('/', defaultRouter);
+  app.use(bearerToken())
   app.use('/users/', routes);
-
   console.log(
     "Your server is listening on port %d (http://localhost:%d)",
     serverPort,
