@@ -1,3 +1,5 @@
+![Build Status](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiMUtUd3l4M0t2ekh2RUVVNkNvenpRQ2dPK3BxU1piaEltOFhwNDErdHN6cVIveFMyeUx3MjNnNXFjb3Q1V2VzM0xXQURpTWlTVThjTXRXYjRGQzVTM01rPSIsIml2UGFyYW1ldGVyU3BlYyI6IkhZbkNqT2tDeTNWVC9EUTMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
+
 # Swagger generated server
 
 ## Overview
